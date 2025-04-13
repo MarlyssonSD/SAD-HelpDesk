@@ -220,7 +220,50 @@ ORDER BY
     dp.Nivel_Prioridade_, dt.Data_;
 
     
---- I)
+--- IJ)
+SELECT 
+    f.ID_Funcionario_,
+    f.Nome,
+    f.Setor,
+    COUNT(fc.ID_Chamado_) AS Total_Chamados_Atendidos
+FROM 
+    Fato_Chamados fc
+JOIN 
+    Dim_Funcionario f ON fc.ID_Funcionario_ = f.ID_Funcionario_
+JOIN 
+    Dim_Status s ON fc.ID_Status_ = s.ID_Status_
+WHERE 
+    s.Descricao_Status_ IN ('Resolvido', 'Fechado')
+GROUP BY 
+    f.ID_Funcionario_, f.Nome, f.Setor
+ORDER BY 
+    Total_Chamados_Atendidos DESC;
+
+
+--- K)
+SELECT 
+    dpt.Nome_Departamento_,
+    dt.Ano,
+    dt.Mes,
+    dt.Dia,
+    dt.nomeMes,
+    COUNT(fc.ID_Chamado_) AS Total_Chamados_Abertos
+FROM 
+    Fato_Chamados fc
+JOIN 
+    Dim_Usuario u ON fc.ID_Usuario_ = u.ID_Usuario_
+JOIN 
+    Dim_Departamento dpt ON fc.ID_Departamento_ = dpt.ID_Departamento_
+JOIN 
+    Dim_Tempo dt ON fc.ID_Tempo = dt.ID_Tempo
+JOIN 
+    Dim_Status s ON fc.ID_Status_ = s.ID_Status_
+WHERE 
+    s.Descricao_Status_ = 'Aberto'
+GROUP BY 
+    dpt.Nome_Departamento_, dt.Ano, dt.Mes, dt.Dia, dt.nomeMes
+ORDER BY 
+    dt.Ano, dt.Mes, dt.Dia;
 
 
 
@@ -253,31 +296,5 @@ GROUP BY
     dt.Ano
 ORDER BY 
     dt.Ano;
---- Q)
-SELECT 
-    dt.Ano,
-    ds.Nivel_Satisfacao,
-    SUM(fc.quantidade) as total_chamados
-FROM 
-    Fato_Chamados fc
-JOIN 
-    Dim_Tempo dt ON fc.ID_Tempo = dt.ID_Tempo
-JOIN 
-    Dim_Satisfacao ds ON fc.ID_Satisfacao_ = ds.ID_Satisfacao_
-GROUP BY 
-    dt.Ano, ds.Nivel_Satisfacao
-ORDER BY 
-    dt.Ano, ds.Cod_Satisfacao;
     
     
-    
-    
-    SELECT 
-    t.Ano,
-    t.Mes,
-    t.nomeMes,
-    COUNT(*) AS total_chamados_abertos
-FROM Fato_Chamados f
-JOIN Dim_Tempo t ON f.ID_Tempo = t.ID_Tempo
-GROUP BY t.Ano, t.Mes, t.nomeMes
-ORDER BY t.Ano, t.Mes;
