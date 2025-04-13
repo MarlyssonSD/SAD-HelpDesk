@@ -117,6 +117,28 @@ CREATE TABLE IF NOT EXISTS Fato_Chamados (
     PRIMARY KEY (ID_Chamado_, id_categoria)
 );
 
+
+-- AGREGADO POR SEMESTRE =============
+CREATE TABLE IF NOT EXISTS Agregado_Semestral (
+    ID_Semestre INT NOT NULL,
+    Ano INT NOT NULL,
+    Semestre INT NOT NULL,
+    NomeSemestre VARCHAR(20) NOT NULL,
+    quantidade_chamados INT,
+    tempo_medio_abertura_andamento INT,
+    tempo_medio_abertura_fechamento INT,
+    tempo_medio_andamento_fechamento INT,
+    tempo_medio_esperado INT,
+    indice_eficiencia DECIMAL(10,2),
+    nivel_satisfacao_medio DECIMAL(10,2),
+    qtd_prioridade_alta INT,
+    qtd_prioridade_critica INT,
+    PRIMARY KEY (ID_Semestre)
+);
+CREATE INDEX idx_agregado_semestral_ano ON Agregado_Semestral(Ano);
+CREATE INDEX idx_agregado_semestral_semestre ON Agregado_Semestral(Semestre);
+
+
 -- ligações
 ALTER TABLE Fato_Chamados ADD CONSTRAINT dim_categoria_fato_chamados_fk
 FOREIGN KEY (id_categoria)
@@ -185,18 +207,18 @@ ON DELETE NO ACTION
 ON UPDATE NO ACTION;
 
 -- Limpar dados anteriores (se necessário)
--- DELETE FROM Fato_Chamados;
--- DELETE FROM Dim_Categoria;
--- DELETE FROM Dim_CanalAtendimento;
--- DELETE FROM Dim_Satisfacao;
--- DELETE FROM Dim_Prioridade;
--- DELETE FROM Dim_Status;
--- DELETE FROM Dim_TipoServico;
--- DELETE FROM Dim_Suporte;
--- DELETE FROM Dim_Funcionario;
--- DELETE FROM Dim_Departamento;
--- DELETE FROM Dim_Usuario;
--- DELETE FROM Dim_Tempo;
+ DELETE FROM Fato_Chamados;
+ DELETE FROM Dim_Categoria;
+ DELETE FROM Dim_CanalAtendimento;
+ DELETE FROM Dim_Satisfacao;
+ DELETE FROM Dim_Prioridade;
+ DELETE FROM Dim_Status;
+ DELETE FROM Dim_TipoServico;
+ DELETE FROM Dim_Suporte;
+ DELETE FROM Dim_Funcionario;
+ DELETE FROM Dim_Departamento;
+ DELETE FROM Dim_Usuario;
+ DELETE FROM Dim_Tempo;
 
 -- Preencher Dim_Tempo (2023 e 2024)
 INSERT INTO Dim_Tempo (ID_Tempo, Data_, Dia, Dia_Semana_, DiaUtil, Feriado, FimSemana, Quinzena, Mes, nomeMes, FimMes, Trimestre_, nomeTrimestre_, Semestre_, NomeSemestre, Ano, Estacao)
@@ -371,46 +393,8 @@ VALUES
   (9, 'Luiz Silva', 'Analista de Sistemas'),
   (10, 'Amanda Rodrigues', 'Atendente');
 
--- Inserir 30 registros na Fato_Chamados para 2023
-INSERT INTO Fato_Chamados (
-  ID_Chamado_, id_categoria, ID_Satisfacao_, ID_Prioridade_, ID_Status_, 
-  ID_Servico_, id_suporte, ID_Funcionario_, ID_Tempo, ID_Usuario_, 
-  ID_Departamento_, ID_Canal, tempo_abertura_andamento, tempo_abertura_fechamento, 
-  tempo_andamento_fechamento, Tempo_Esperado_Atendimento_, quantidade
-)
-VALUES
-  (1001, 1, 4, 2, 5, 1, 1, 1, 2023001, 1, 1, 2, 125, 553, 428, 480, 1),
-  (1002, 2, 3, 2, 5, 2, 2, 2, 2023002, 2, 2, 1, 92, 1474, 1382, 720, 1),
-  (1003, 3, 4, 1, 5, 3, 1, 3, 2023003, 3, 3, 3, 138, 1397, 1259, 240, 1),
-  (1004, 4, 5, 3, 5, 4, 3, 4, 2023004, 4, 4, 4, 170, 7858, 7688, 960, 1),
-  (1005, 5, 3, 3, 5, 5, 2, 5, 2023005, 5, 5, 2, 144, 3133, 2989, 480, 1),
-  (1006, 6, 4, 2, 5, 6, 3, 6, 2023006, 6, 6, 1, 141, 2186, 2045, 360, 1),
-  (1007, 7, 5, 2, 5, 7, 1, 7, 2023007, 7, 7, 5, 148, 3090, 2942, 240, 1),
-  (1008, 8, 3, 1, 5, 8, 2, 8, 2023007, 8, 8, 3, 100, 714, 614, 360, 1),
-  (1009, 9, 2, 3, 5, 9, 3, 9, 2023008, 9, 9, 2, 130, 1096, 966, 720, 1),
-  (1010, 10, 4, 2, 5, 10, 1, 10, 2023008, 10, 10, 4, 170, 2953, 2783, 480, 1),
-  (1011, 2, 5, 1, 5, 2, 2, 1, 2023003, 1, 3, 1, 83, 2876, 2793, 240, 1),
-  (1012, 3, 4, 2, 5, 3, 1, 2, 2023004, 2, 4, 3, 150, 422, 272, 360, 1),
-  (1013, 4, 3, 3, 5, 4, 3, 3, 2023005, 3, 5, 2, 118, 12211, 12093, 720, 1),
-  (1014, 5, 4, 2, 5, 5, 2, 4, 2023006, 4, 6, 4, 130, 3528, 3398, 480, 1),
-  (1015, 6, 5, 1, 5, 6, 3, 5, 2023007, 5, 7, 1, 174, 23575, 23401, 240, 1),
-  (1016, 7, 2, 3, 5, 7, 1, 6, 2023008, 6, 8, 5, 89, 8109, 8020, 960, 1),
-  (1017, 8, 3, 2, 5, 8, 2, 7, 2023009, 7, 9, 3, 120, 2942, 2822, 480, 1),
-  (1018, 9, 4, 2, 5, 9, 3, 8, 2023009, 8, 10, 2, 78, 873, 795, 360, 1),
-  (1019, 10, 5, 1, 5, 10, 1, 9, 2023010, 9, 1, 4, 100, 2610, 2510, 240, 1),
-  (1020, 1, 3, 3, 5, 1, 2, 10, 2023010, 10, 2, 1, 120, 596, 476, 720, 1),
-  (1021, 3, 4, 2, 5, 3, 3, 1, 2023001, 1, 5, 3, 140, 332, 192, 480, 1),
-  (1022, 4, 5, 2, 5, 4, 1, 2, 2023002, 2, 6, 2, 123, 516, 393, 360, 1),
-  (1023, 5, 2, 3, 5, 5, 2, 3, 2023004, 3, 7, 4, 135, 12859, 12724, 720, 1),
-  (1024, 6, 3, 2, 5, 6, 3, 4, 2023005, 4, 8, 1, 133, 1313, 1180, 480, 1),
-  (1025, 7, 4, 1, 5, 7, 1, 5, 2023006, 5, 9, 5, 99, 1945, 1846, 240, 1),
-  (1026, 8, 5, 3, 5, 8, 2, 6, 2023007, 6, 10, 3, 130, 250, 120, 960, 1),
-  (1027, 9, 3, 2, 5, 9, 3, 7, 2023008, 7, 1, 2, 107, 7112, 7005, 480, 1),
-  (1028, 10, 4, 2, 5, 10, 1, 8, 2023009, 8, 2, 4, 122, 859, 737, 360, 1),
-  (1029, 1, 5, 1, 5, 1, 2, 9, 2023009, 9, 3, 1, 204, 2420, 2216, 240, 1),
-  (1030, 2, 3, 3, 5, 2, 3, 10, 2023010, 10, 4, 5, 115, 3215, 3100, 720, 1);
 
--- Inserir 30 registros na Fato_Chamados para 2024
+-- Inserir 50 registros na Fato_Chamados para 2023 com diferentes status
 INSERT INTO Fato_Chamados (
   ID_Chamado_, id_categoria, ID_Satisfacao_, ID_Prioridade_, ID_Status_, 
   ID_Servico_, id_suporte, ID_Funcionario_, ID_Tempo, ID_Usuario_, 
@@ -418,33 +402,193 @@ INSERT INTO Fato_Chamados (
   tempo_andamento_fechamento, Tempo_Esperado_Atendimento_, quantidade
 )
 VALUES
-  (2001, 2, 4, 2, 5, 2, 2, 2, 2024001, 2, 2, 3, 110, 480, 370, 360, 1),
+  (1001, 1, 4, 2, 3, 1, 1, 1, 2023001, 1, 1, 2, 125, 553, 428, 480, 1),
+  (1002, 2, 3, 2, 5, 2, 2, 2, 2023002, 2, 2, 1, 92, 1474, 1382, 720, 1),
+  (1003, 3, 4, 1, 2, 3, 1, 3, 2023003, 3, 3, 3, 138, 1397, 1259, 240, 1),
+  (1004, 4, 5, 3, 6, 4, 3, 4, 2023004, 4, 4, 4, 170, 7858, 7688, 960, 1),
+  (1005, 5, 3, 3, 5, 5, 2, 5, 2023005, 5, 5, 2, 144, 3133, 2989, 480, 1),
+  (1006, 6, 4, 2, 1, 6, 3, 6, 2023006, 6, 6, 1, 141, 2186, 2045, 360, 1),
+  (1007, 7, 5, 2, 4, 7, 1, 7, 2023007, 7, 7, 5, 148, 3090, 2942, 240, 1),
+  (1008, 8, 3, 1, 5, 8, 2, 8, 2023007, 8, 8, 3, 100, 714, 614, 360, 1),
+  (1009, 9, 2, 3, 3, 9, 3, 9, 2023008, 9, 9, 2, 130, 1096, 966, 720, 1),
+  (1010, 10, 4, 2, 6, 10, 1, 10, 2023008, 10, 10, 4, 170, 2953, 2783, 480, 1),
+  (1011, 2, 5, 1, 2, 2, 2, 1, 2023003, 1, 3, 1, 83, 2876, 2793, 240, 1),
+  (1012, 3, 4, 2, 4, 3, 1, 2, 2023004, 2, 4, 3, 150, 422, 272, 360, 1),
+  (1013, 4, 3, 3, 5, 4, 3, 3, 2023005, 3, 5, 2, 118, 12211, 12093, 720, 1),
+  (1014, 5, 4, 2, 1, 5, 2, 4, 2023006, 4, 6, 4, 130, 3528, 3398, 480, 1),
+  (1015, 6, 5, 1, 3, 6, 3, 5, 2023007, 5, 7, 1, 174, 23575, 23401, 240, 1),
+  (1016, 7, 2, 3, 6, 7, 1, 6, 2023008, 6, 8, 5, 89, 8109, 8020, 960, 1),
+  (1017, 8, 3, 2, 4, 8, 2, 7, 2023009, 7, 9, 3, 120, 2942, 2822, 480, 1),
+  (1018, 9, 4, 2, 2, 9, 3, 8, 2023009, 8, 10, 2, 78, 873, 795, 360, 1),
+  (1019, 10, 5, 1, 5, 10, 1, 9, 2023010, 9, 1, 4, 100, 2610, 2510, 240, 1),
+  (1020, 1, 3, 3, 1, 1, 2, 10, 2023010, 10, 2, 1, 120, 596, 476, 720, 1),
+  (1021, 3, 4, 2, 3, 3, 3, 1, 2023001, 1, 5, 3, 140, 332, 192, 480, 1),
+  (1022, 4, 5, 2, 6, 4, 1, 2, 2023002, 2, 6, 2, 123, 516, 393, 360, 1),
+  (1023, 5, 2, 3, 4, 5, 2, 3, 2023004, 3, 7, 4, 135, 12859, 12724, 720, 1),
+  (1024, 6, 3, 2, 5, 6, 3, 4, 2023005, 4, 8, 1, 133, 1313, 1180, 480, 1),
+  (1025, 7, 4, 1, 2, 7, 1, 5, 2023006, 5, 9, 5, 99, 1945, 1846, 240, 1),
+  (1026, 8, 5, 3, 1, 8, 2, 6, 2023007, 6, 10, 3, 130, 250, 120, 960, 1),
+  (1027, 9, 3, 2, 3, 9, 3, 7, 2023008, 7, 1, 2, 107, 7112, 7005, 480, 1),
+  (1028, 10, 4, 2, 6, 10, 1, 8, 2023009, 8, 2, 4, 122, 859, 737, 360, 1),
+  (1029, 1, 5, 1, 4, 1, 2, 9, 2023009, 9, 3, 1, 204, 2420, 2216, 240, 1),
+  (1030, 2, 3, 3, 5, 2, 3, 10, 2023010, 10, 4, 5, 115, 3215, 3100, 720, 1),
+  (1031, 4, 4, 2, 2, 4, 1, 2, 2023001, 2, 6, 3, 95, 480, 385, 360, 1),
+  (1032, 5, 3, 1, 1, 5, 2, 3, 2023002, 3, 7, 2, 120, 720, 600, 240, 1),
+  (1033, 6, 5, 3, 3, 6, 3, 4, 2023003, 4, 8, 1, 140, 300, 160, 720, 1),
+  (1034, 7, 4, 2, 6, 7, 1, 5, 2023004, 5, 9, 4, 175, 550, 375, 360, 1),
+  (1035, 8, 2, 3, 4, 8, 2, 6, 2023005, 6, 10, 5, 130, 890, 760, 960, 1),
+  (1036, 9, 3, 2, 5, 9, 3, 7, 2023006, 7, 1, 1, 85, 420, 335, 480, 1),
+  (1037, 10, 4, 1, 2, 10, 1, 8, 2023007, 8, 2, 2, 120, 270, 150, 240, 1),
+  (1038, 1, 5, 3, 3, 1, 2, 9, 2023008, 9, 3, 3, 160, 760, 600, 720, 1),
+  (1039, 2, 3, 2, 1, 2, 3, 10, 2023009, 10, 4, 4, 90, 410, 320, 360, 1),
+  (1040, 3, 4, 2, 6, 3, 1, 1, 2023010, 1, 5, 5, 105, 430, 325, 480, 1),
+  (1041, 5, 5, 1, 4, 5, 2, 3, 2023001, 3, 7, 2, 75, 250, 175, 240, 1),
+  (1042, 6, 3, 3, 5, 6, 3, 4, 2023002, 4, 8, 3, 170, 820, 650, 720, 1),
+  (1043, 7, 4, 2, 2, 7, 1, 5, 2023003, 5, 9, 1, 115, 480, 365, 360, 1),
+  (1044, 8, 5, 1, 1, 8, 2, 6, 2023004, 6, 10, 4, 80, 265, 185, 240, 1),
+  (1045, 9, 2, 3, 3, 9, 3, 7, 2023005, 7, 1, 5, 195, 940, 745, 960, 1),
+  (1046, 10, 3, 2, 6, 10, 1, 8, 2023006, 8, 2, 1, 110, 495, 385, 480, 1),
+  (1047, 1, 4, 2, 4, 1, 2, 9, 2023007, 9, 3, 2, 125, 520, 395, 360, 1),
+  (1048, 2, 5, 1, 5, 2, 3, 10, 2023008, 10, 4, 3, 70, 235, 165, 240, 1),
+  (1049, 3, 3, 3, 2, 3, 1, 1, 2023009, 1, 5, 4, 190, 880, 690, 720, 1),
+  (1050, 4, 4, 2, 1, 4, 3, 2, 2023010, 2, 6, 5, 120, 470, 350, 480, 1);
+
+-- Inserir 50 registros na Fato_Chamados para 2024 com diferentes status
+INSERT INTO Fato_Chamados (
+  ID_Chamado_, id_categoria, ID_Satisfacao_, ID_Prioridade_, ID_Status_, 
+  ID_Servico_, id_suporte, ID_Funcionario_, ID_Tempo, ID_Usuario_, 
+  ID_Departamento_, ID_Canal, tempo_abertura_andamento, tempo_abertura_fechamento, 
+  tempo_andamento_fechamento, Tempo_Esperado_Atendimento_, quantidade
+)
+VALUES
+  (2001, 2, 4, 2, 3, 2, 2, 2, 2024001, 2, 2, 3, 110, 480, 370, 360, 1),
   (2002, 3, 3, 3, 5, 3, 3, 3, 2024001, 3, 3, 2, 95, 720, 625, 480, 1),
-  (2003, 4, 5, 1, 5, 4, 1, 4, 2024002, 4, 4, 1, 140, 300, 160, 240, 1),
-  (2004, 5, 4, 2, 5, 5, 2, 5, 2024002, 5, 5, 4, 175, 550, 375, 360, 1),
-  (2005, 6, 2, 3, 5, 6, 3, 6, 2024003, 6, 6, 5, 130, 890, 760, 720, 1),
-  (2006, 7, 3, 2, 5, 7, 1, 7, 2024003, 7, 7, 1, 85, 420, 335, 480, 1),
-  (2007, 8, 4, 1, 5, 8, 2, 8, 2024004, 8, 8, 2, 120, 270, 150, 240, 1),
+  (2003, 4, 5, 1, 2, 4, 1, 4, 2024002, 4, 4, 1, 140, 300, 160, 240, 1),
+  (2004, 5, 4, 2, 6, 5, 2, 5, 2024002, 5, 5, 4, 175, 550, 375, 360, 1),
+  (2005, 6, 2, 3, 4, 6, 3, 6, 2024003, 6, 6, 5, 130, 890, 760, 720, 1),
+  (2006, 7, 3, 2, 1, 7, 1, 7, 2024003, 7, 7, 1, 85, 420, 335, 480, 1),
+  (2007, 8, 4, 1, 3, 8, 2, 8, 2024004, 8, 8, 2, 120, 270, 150, 240, 1),
   (2008, 9, 5, 3, 5, 9, 3, 9, 2024004, 9, 9, 3, 160, 760, 600, 480, 1),
-  (2009, 10, 3, 2, 5, 10, 1, 10, 2024005, 10, 10, 4, 90, 410, 320, 360, 1),
-  (2010, 1, 4, 2, 5, 1, 2, 1, 2024005, 1, 1, 5, 105, 430, 325, 480, 1),
-  (2011, 3, 5, 1, 5, 3, 1, 3, 2024001, 3, 4, 2, 75, 250, 175, 240, 1),
-  (2012, 4, 3, 3, 5, 4, 3, 4, 2024002, 4, 5, 3, 170, 820, 650, 720, 1),
+  (2009, 10, 3, 2, 2, 10, 1, 10, 2024005, 10, 10, 4, 90, 410, 320, 360, 1),
+  (2010, 1, 4, 2, 1, 1, 2, 1, 2024005, 1, 1, 5, 105, 430, 325, 480, 1),
+  (2011, 3, 5, 1, 6, 3, 1, 3, 2024001, 3, 4, 2, 75, 250, 175, 240, 1),
+  (2012, 4, 3, 3, 4, 4, 3, 4, 2024002, 4, 5, 3, 170, 820, 650, 720, 1),
   (2013, 5, 4, 2, 5, 5, 2, 5, 2024003, 5, 6, 1, 115, 480, 365, 360, 1),
-  (2014, 6, 5, 1, 5, 6, 3, 6, 2024004, 6, 7, 4, 80, 265, 185, 240, 1),
-  (2015, 7, 2, 3, 5, 7, 1, 7, 2024005, 7, 8, 5, 195, 940, 745, 720, 1),
-  (2016, 8, 3, 2, 5, 8, 2, 8, 2024006, 8, 9, 1, 110, 495, 385, 480, 1),
-  (2017, 9, 4, 2, 5, 9, 3, 9, 2024006, 9, 10, 2, 125, 520, 395, 360, 1),
-  (2018, 10, 5, 1, 5, 10, 1, 10, 2024007, 10, 1, 3, 70, 235, 165, 240, 1),
+  (2014, 6, 5, 1, 2, 6, 3, 6, 2024004, 6, 7, 4, 80, 265, 185, 240, 1),
+  (2015, 7, 2, 3, 3, 7, 1, 7, 2024005, 7, 8, 5, 195, 940, 745, 720, 1),
+  (2016, 8, 3, 2, 1, 8, 2, 8, 2024006, 8, 9, 1, 110, 495, 385, 480, 1),
+  (2017, 9, 4, 2, 6, 9, 3, 9, 2024006, 9, 10, 2, 125, 520, 395, 360, 1),
+  (2018, 10, 5, 1, 4, 10, 1, 10, 2024007, 10, 1, 3, 70, 235, 165, 240, 1),
   (2019, 1, 3, 3, 5, 1, 2, 1, 2024007, 1, 2, 4, 190, 880, 690, 720, 1),
-  (2020, 2, 4, 2, 5, 2, 3, 2, 2024008, 2, 3, 5, 120, 470, 350, 360, 1),
-  (2021, 4, 5, 1, 5, 4, 1, 4, 2024006, 4, 6, 2, 85, 240, 155, 240, 1),
-  (2022, 5, 3, 3, 5, 5, 2, 5, 2024007, 5, 7, 3, 175, 835, 660, 720, 1),
-  (2023, 6, 4, 2, 5, 6, 3, 6, 2024008, 6, 8, 1, 100, 450, 350, 360, 1),
-  (2024, 7, 5, 1, 5, 7, 1, 7, 2024008, 7, 9, 4, 65, 220, 155, 240, 1),
+  (2020, 2, 4, 2, 2, 2, 3, 2, 2024008, 2, 3, 5, 120, 470, 350, 360, 1),
+  (2021, 4, 5, 1, 3, 4, 1, 4, 2024006, 4, 6, 2, 85, 240, 155, 240, 1),
+  (2022, 5, 3, 3, 1, 5, 2, 5, 2024007, 5, 7, 3, 175, 835, 660, 720, 1),
+  (2023, 6, 4, 2, 6, 6, 3, 6, 2024008, 6, 8, 1, 100, 450, 350, 360, 1),
+  (2024, 7, 5, 1, 4, 7, 1, 7, 2024008, 7, 9, 4, 65, 220, 155, 240, 1),
   (2025, 8, 2, 3, 5, 8, 2, 8, 2024009, 8, 10, 5, 185, 910, 725, 720, 1),
-  (2026, 9, 3, 2, 5, 9, 3, 9, 2024009, 9, 1, 1, 135, 510, 375, 480, 1),
-  (2027, 10, 4, 2, 5, 10, 1, 10, 2024010, 10, 2, 2, 95, 440, 345, 360, 1),
-  (2028, 1, 5, 1, 5, 1, 2, 1, 2024010, 1, 3, 3, 60, 215, 155, 240, 1),
-  (2029, 2, 3, 3, 5, 2, 3, 2, 2024010, 2, 4, 4, 180, 865, 685, 720, 1),
-  (2030, 3, 4, 2, 5, 3, 1, 3, 2024010, 3, 5, 5, 130, 460, 330, 360, 1);
+  (2026, 9, 3, 2, 2, 9, 3, 9, 2024009, 9, 1, 1, 135, 510, 375, 480, 1),
+  (2027, 10, 4, 2, 3, 10, 1, 10, 2024010, 10, 2, 2, 95, 440, 345, 360, 1),
+  (2028, 1, 5, 1, 1, 1, 2, 1, 2024010, 1, 3, 3, 60, 215, 155, 240, 1),
+  (2029, 2, 3, 3, 6, 2, 3, 2, 2024010, 2, 4, 4, 180, 865, 685, 720, 1),
+  (2030, 3, 4, 2, 4, 3, 1, 3, 2024010, 3, 5, 5, 130, 460, 330, 360, 1),
+  (2031, 5, 4, 2, 5, 5, 2, 5, 2024001, 5, 7, 3, 145, 580, 435, 360, 1),
+  (2032, 6, 3, 1, 2, 6, 3, 6, 2024002, 6, 8, 2, 90, 310, 220, 240, 1),
+  (2033, 7, 5, 3, 3, 7, 1, 7, 2024003, 7, 9, 1, 155, 670, 515, 720, 1),
+  (2034, 8, 4, 2, 1, 8, 2, 8, 2024004, 8, 10, 4, 105, 490, 385, 480, 1),
+  (2035, 9, 2, 3, 6, 9, 3, 9, 2024005, 9, 1, 5, 70, 290, 220, 960, 1),
+  (2036, 10, 3, 2, 4, 10, 1, 10, 2024006, 10, 2, 1, 125, 530, 405, 360, 1),
+  (2037, 1, 4, 1, 5, 1, 2, 1, 2024007, 1, 3, 2, 85, 350, 265, 240, 1),
+  (2038, 2, 5, 3, 2, 2, 3, 2, 2024008, 2, 4, 3, 165, 780, 615, 720, 1),
+  (2039, 3, 3, 2, 3, 3, 1, 3, 2024009, 3, 5, 4, 115, 470, 355, 480, 1),
+  (2040, 4, 4, 1, 1, 4, 3, 4, 2024010, 4, 6, 5, 95, 410, 315, 240, 1),
+  (2041, 6, 5, 2, 6, 6, 3, 6, 2024001, 6, 8, 1, 135, 540, 405, 360, 1),
+  (2042, 7, 3, 3, 4, 7, 1, 7, 2024002, 7, 9, 2, 80, 330, 250, 720, 1),
+  (2043, 8, 4, 2, 5, 8, 2, 8, 2024003, 8, 10, 3, 150, 620, 470, 480, 1),
+  (2044, 9, 2, 1, 2, 9, 3, 9, 2024004, 9, 1, 4, 100, 430, 330, 240, 1),
+  (2045, 10, 3, 3, 3, 10, 1, 10, 2024005, 10, 2, 5, 175, 750, 575, 960, 1),
+  (2046, 1, 4, 2, 1, 1, 2, 1, 2024006, 1, 3, 1, 120, 490, 370, 360, 1),
+  (2047, 2, 5, 1, 6, 2, 3, 2, 2024007, 2, 4, 2, 90, 380, 290, 240, 1),
+  (2048, 3, 3, 3, 4, 3, 1, 3, 2024008, 3, 5, 3, 140, 590, 450, 720, 1),
+  (2049, 4, 4, 2, 5, 4, 3, 4, 2024009, 4, 6, 4, 110, 460, 350, 480, 1),
+  (2050, 5, 2, 1, 2, 5, 2, 5, 2024010, 5, 7, 5, 85, 370, 285, 240, 1);
+
+-- INSERIR EM AGREGADO_SEMESTRAL
+INSERT INTO Agregado_Semestral
+SELECT 
+    (t.Ano * 10) + t.Semestre_ AS ID_Semestre,
+    t.Ano,
+    t.Semestre_,
+    t.NomeSemestre,
+    COUNT(f.ID_Chamado_) AS quantidade_chamados,
+    AVG(f.tempo_abertura_andamento) AS tempo_medio_abertura_andamento,
+    AVG(f.tempo_abertura_fechamento) AS tempo_medio_abertura_fechamento,
+    AVG(f.tempo_andamento_fechamento) AS tempo_medio_andamento_fechamento,
+    AVG(f.Tempo_Esperado_Atendimento_) AS tempo_medio_esperado,
+    AVG(f.Tempo_Esperado_Atendimento_ / NULLIF(f.tempo_abertura_fechamento, 0)) * 100 AS indice_eficiencia,
+    AVG(s.Cod_Satisfacao) AS nivel_satisfacao_medio,
+    SUM(CASE WHEN p.ID_Prioridade_ = 3 THEN 1 ELSE 0 END) AS qtd_prioridade_alta,
+    SUM(CASE WHEN p.ID_Prioridade_ = 4 THEN 1 ELSE 0 END) AS qtd_prioridade_critica
+FROM Fato_Chamados f
+JOIN Dim_Tempo t ON f.ID_Tempo = t.ID_Tempo
+JOIN Dim_Satisfacao s ON f.ID_Satisfacao_ = s.ID_Satisfacao_
+JOIN Dim_Prioridade p ON f.ID_Prioridade_ = p.ID_Prioridade_
+GROUP BY t.Ano, t.Semestre_, t.NomeSemestre
+ORDER BY t.Ano, t.Semestre_;
+
+DELIMITER //
+CREATE PROCEDURE atualizarAgregadoSemestral()
+BEGIN
+    -- Limpar dados da tabela de agregados
+    TRUNCATE TABLE Agregado_Semestral;
+    
+    -- Inserir dados atualizados
+    INSERT INTO Agregado_Semestral
+    SELECT 
+        (t.Ano * 10) + t.Semestre_ AS ID_Semestre,
+        t.Ano,
+        t.Semestre_,
+        t.NomeSemestre,
+        COUNT(f.ID_Chamado_) AS quantidade_chamados,
+        AVG(f.tempo_abertura_andamento) AS tempo_medio_abertura_andamento,
+        AVG(f.tempo_abertura_fechamento) AS tempo_medio_abertura_fechamento,
+        AVG(f.tempo_andamento_fechamento) AS tempo_medio_andamento_fechamento,
+        AVG(f.Tempo_Esperado_Atendimento_) AS tempo_medio_esperado,
+        AVG(f.Tempo_Esperado_Atendimento_ / NULLIF(f.tempo_abertura_fechamento, 0)) * 100 AS indice_eficiencia,
+        AVG(s.Cod_Satisfacao) AS nivel_satisfacao_medio,
+        SUM(CASE WHEN p.ID_Prioridade_ = 3 THEN 1 ELSE 0 END) AS qtd_prioridade_alta,
+        SUM(CASE WHEN p.ID_Prioridade_ = 4 THEN 1 ELSE 0 END) AS qtd_prioridade_critica
+    FROM Fato_Chamados f
+    JOIN Dim_Tempo t ON f.ID_Tempo = t.ID_Tempo
+    JOIN Dim_Satisfacao s ON f.ID_Satisfacao_ = s.ID_Satisfacao_
+    JOIN Dim_Prioridade p ON f.ID_Prioridade_ = p.ID_Prioridade_
+    GROUP BY t.Ano, t.Semestre_, t.NomeSemestre
+    ORDER BY t.Ano, t.Semestre_;
+END //
+DELIMITER ;
+
+
+
+-- Exemplo de consulta para análise de tendências por semestre
+SELECT 
+    Ano, 
+    NomeSemestre, 
+    quantidade_chamados, 
+    nivel_satisfacao_medio,
+    indice_eficiencia
+FROM Agregado_Semestral
+ORDER BY Ano, Semestre;
+
+-- Exemplo de consulta para comparação entre semestres
+SELECT 
+    a1.Ano AS Ano_Anterior, 
+    a1.NomeSemestre AS Semestre_Anterior,
+    a1.quantidade_chamados AS Chamados_Anterior,
+    a2.Ano AS Ano_Atual,
+    a2.NomeSemestre AS Semestre_Atual,
+    a2.quantidade_chamados AS Chamados_Atual,
+    (a2.quantidade_chamados - a1.quantidade_chamados) AS Diferenca_Chamados,
+    ((a2.quantidade_chamados - a1.quantidade_chamados) / a1.quantidade_chamados) * 100 AS Percentual_Crescimento
+FROM Agregado_Semestral a1
+JOIN Agregado_Semestral a2 ON a1.ID_Semestre + 1 = a2.ID_Semestre;
+
+
