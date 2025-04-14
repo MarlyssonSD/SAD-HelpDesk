@@ -266,23 +266,98 @@ ORDER BY
     dt.Ano, dt.Mes, dt.Dia;
 
 
+--- L)
+SELECT 
+    ds.descricao_suporte AS Nivel_Suporte,
+    COUNT(fc.ID_Chamado_) AS Total_Chamados_Fechados
+FROM 
+    Fato_Chamados fc
+JOIN 
+    Dim_Suporte ds ON fc.id_suporte = ds.id_suporte
+JOIN 
+    Dim_Status s ON fc.ID_Status_ = s.ID_Status_
+WHERE 
+    s.Descricao_Status_ IN ('Fechado', 'Resolvido')
+GROUP BY 
+    ds.descricao_suporte
+ORDER BY 
+    Total_Chamados_Fechados DESC;
+
+--- M) N) O)
+SELECT 
+    -- m) Média de tempo entre abertura e atendimento (N1 + Alta prioridade)
+    ROUND(AVG(CASE 
+        WHEN dp.Nivel_Prioridade_ = 'Alta' AND ds.cod_suporte = 301
+        THEN fc.tempo_abertura_andamento 
+    END) / 60 / 24, 2) AS Media_Abertura_Atendimento_N1_Alta,
+
+    -- n) Média de tempo entre abertura e atendimento (N1, todas prioridades)
+    ROUND(AVG(CASE 
+        WHEN ds.cod_suporte = 301
+        THEN fc.tempo_abertura_andamento 
+    END) / 60 / 24, 2) AS Media_Abertura_Atendimento_N1_Geral,
+
+    -- o) Média de tempo entre abertura e fechamento
+    ROUND(AVG(fc.tempo_abertura_fechamento) / 60 / 24, 2) AS Media_Abertura_Fechamento
+FROM 
+    Fato_Chamados fc
+JOIN 
+    Dim_Prioridade dp ON fc.ID_Prioridade_ = dp.ID_Prioridade_
+JOIN 
+    Dim_Suporte ds ON fc.id_suporte = ds.id_suporte
+WHERE 
+    (fc.tempo_abertura_andamento IS NOT NULL OR fc.tempo_abertura_fechamento IS NOT NULL);
 
 
+--- P)
+SELECT
+    d.Nome_Departamento_,
+    COUNT(*) AS Total_Chamados_Em_Atraso
+FROM
+    Fato_Chamados fc
+JOIN
+    Dim_Departamento d ON fc.ID_Departamento_ = d.ID_Departamento_
+WHERE
+    fc.tempo_abertura_fechamento > fc.Tempo_Esperado_Atendimento_
+GROUP BY
+    d.Nome_Departamento_
+ORDER BY
+    Total_Chamados_Em_Atraso DESC;
 
---- O)
-    SELECT 
+
+--- Q)
+SELECT 
+    s.Nivel_Satisfacao,
+    COUNT(fc.ID_Chamado_) AS Numero_de_Chamados
+FROM 
+    Fato_Chamados fc
+JOIN 
+    Dim_Satisfacao s ON fc.ID_Satisfacao_ = s.ID_Satisfacao_
+GROUP BY 
+    s.Nivel_Satisfacao, s.Cod_Satisfacao
+ORDER BY 
+    s.Cod_Satisfacao;
+
+
+--- =================================================
+
+--- Medias de atendimentos p/ANO
+SELECT 
     dt.Ano,
-    AVG(fc.tempo_abertura_fechamento/60.0/24.0) as media_dias_atendimento
+    ROUND(AVG(fc.tempo_abertura_fechamento / 60.0 / 24.0), 2) AS media_dias_atendimento
 FROM 
     Fato_Chamados fc
 JOIN 
     Dim_Tempo dt ON fc.ID_Tempo = dt.ID_Tempo
+WHERE 
+    fc.tempo_abertura_fechamento IS NOT NULL
 GROUP BY 
     dt.Ano
 ORDER BY 
     dt.Ano;
-    
---- P)
+
+
+--- Chamados Atrasados
 SELECT 
     dt.Ano,
     COUNT(*) as chamados_atrasados
